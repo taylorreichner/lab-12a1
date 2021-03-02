@@ -31,35 +31,30 @@ describe('app routes', () => {
       return client.end(done);
     });
 
-    test('returns animals', async() => {
+   
 
-      const expectation = [
-        {
-          'id': 1,
-          'name': 'bessie',
-          'coolfactor': 3,
-          'owner_id': 1
-        },
-        {
-          'id': 2,
-          'name': 'jumpy',
-          'coolfactor': 4,
-          'owner_id': 1
-        },
-        {
-          'id': 3,
-          'name': 'spot',
-          'coolfactor': 10,
-          'owner_id': 1
-        }
+    test('returns all todos', async() => {
+      const todo = [ {
+        todo: 'laundry',
+        completed: false,
+      }
       ];
+      const expected = {
+        id: 2,
+        todo: 'laundry',
+        completed: false,
+        user_id: 1,
+      }
+     
 
       const data = await fakeRequest(app)
-        .get('/animals')
+        .get('/api/todos')
+        .send(todo)
+        .set('Authorization', token)
         .expect('Content-Type', /json/)
-        .expect(200);
+       // .expect(200);
 
-      expect(data.body).toEqual(expectation);
+      expect(data.body).toEqual(expected);
     });
   });
 });
