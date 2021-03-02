@@ -30,31 +30,68 @@ describe('app routes', () => {
     afterAll(done => {
       return client.end(done);
     });
+    const newTodo =  {
+      todo: 'laundry',
+      completed: false,
+    };
 
+    const dbTodo = {
+      ...newTodo,
+      owner_id: 2,
+      id: 4,
+    };
    
 
-    test('returns all todos', async() => {
-      const todo = [ {
+    test('creates a todo todos', async() => {
+      const newTodo = {
         todo: 'laundry',
         completed: false,
       }
-      ];
-      const expected = {
-        id: 2,
-        todo: 'laundry',
-        completed: false,
-        user_id: 1,
-      }
+      
+     
      
 
       const data = await fakeRequest(app)
-        .get('/api/todos')
-        .send(todo)
+        .post('/api/todos')
+        .send(newTodo)
         .set('Authorization', token)
         .expect('Content-Type', /json/)
-       // .expect(200);
+        .expect(200);
 
-      expect(data.body).toEqual(expected);
+      expect(data.body[0]).toEqual(dbTodo);
     });
+
+    test('returns all todos for a given user', async() => {
+      
+      const data = await fakeRequest(app)
+       
+        .get('/api/todos')
+        .set('Authorization', token)
+        .expect('Content-Type', /json/)
+        .expect(200);
+
+      expect(data.body).toEqual([dbTodo]);
+    });
+
+    test('returns todo with same id', async() => {
+
+      const data = await fakeRequest(app)
+        .get('/api/todos/4')
+        .set('Authorization', token)
+        .expect('Content-Type', /json/)
+        .expect(200);
+
+      expect(data.body[0]).toEqual(dbTodo);
+
+
+      const empty = await fakeRequest(app)
+        .get('/api/todos/1')
+        .set('Authorization', token)
+        .expect('Content-Type', /json/)
+        .expect(200);
+
+      expect(empty.body).toEqual([]);
+    });
+
   });
 });
